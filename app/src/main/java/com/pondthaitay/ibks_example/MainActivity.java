@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.accent_systems.ibks_sdk.scanner.ASBleScanner;
@@ -77,6 +78,10 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
         }
     }
 
+    private double getDistance(int rssi, int txPower) {
+        return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
+    }
+
     @OnShowRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
     void showRationaleForCamera(final PermissionRequest request) {
         new AlertDialog.Builder(this)
@@ -117,6 +122,11 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
     public void scannedBleDevices(ScanResult scanResult) {
         String advertisingString = ASResultParser.byteArrayToHex(scanResult.getScanRecord().getBytes());
         String logstr = scanResult.getDevice().getAddress() + " / RSSI: " + scanResult.getRssi() + " / Adv packet: " + advertisingString;
+        int txPower = scanResult.getScanRecord().getTxPowerLevel();
+        Log.d(TAG, "TxPower : " + txPower);
+        Log.d(TAG, "distance : " + getDistance(scanResult.getRssi(), txPower));
+        Log.d(TAG, "ScanResult : " + scanResult.getScanRecord().toString());
+        ((TextView)findViewById(R.id.tv_distance)).setText(String.valueOf(getDistance(scanResult.getRssi(), txPower)));
         switch (ASResultParser.getAdvertisingType(scanResult)) {
             case ASUtils.TYPE_IBEACON:
                 /**** Example to get data from advertising ***
