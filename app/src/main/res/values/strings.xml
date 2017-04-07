@@ -5,4 +5,7 @@
     <string name="permission_location_never_ask_again">Location permission was denied with never ask again.</string>
     <string name="button_allow">Allow</string>
     <string name="button_deny">Deny</string>
+    <string name="bluetooth_enable">Enable bluetooth?</string>
+    <string name="button_enable">enable</string>
+    <string name="button_cancel">Cancel</string>
 </resources>

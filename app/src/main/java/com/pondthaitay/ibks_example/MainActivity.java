@@ -1,8 +1,10 @@
 package com.pondthaitay.ibks_example;
 
 import android.Manifest;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.le.ScanResult;
 import android.bluetooth.le.ScanSettings;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
@@ -26,11 +28,19 @@ import permissions.dispatcher.RuntimePermissions;
 public class MainActivity extends AppCompatActivity implements ASScannerCallback {
 
     private static final String TAG = MainActivity.class.getName();
+    private static final int REQUEST_BLUE_TOOTH = 1001;
+    private ASBleScanner bleScanner;
 
     @Override
     protected void onStart() {
         super.onStart();
         MainActivityPermissionsDispatcher.showLocationWithCheck(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (bleScanner != null) ASBleScanner.stopScan();
     }
 
     @Override
@@ -41,8 +51,23 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
 
     @NeedsPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
     void showLocation() {
+        BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "This device supported bluetooth.", Toast.LENGTH_SHORT).show();
+        } else {
+            if (!mBluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(enableBtIntent, REQUEST_BLUE_TOOTH);
+            } else {
+                startScan();
+            }
+        }
+    }
+
+    private void startScan() {
         int err;
-        new ASBleScanner(this, this).setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY);
+        bleScanner = new ASBleScanner(this, this);
+        bleScanner.setScanMode(ScanSettings.SCAN_MODE_BALANCED);
         err = ASBleScanner.startScan();
         if (err != ASUtils.TASK_OK) {
             Log.i(TAG, "startScan - Error (" + Integer.toString(err) + ")");
@@ -69,6 +94,17 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
     @OnNeverAskAgain(Manifest.permission.ACCESS_COARSE_LOCATION)
     void showNeverAskForCamera() {
         Toast.makeText(this, R.string.permission_location_never_ask_again, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_BLUE_TOOTH) {
+            if (resultCode == RESULT_OK) {
+                startScan();
+            } else if (resultCode == RESULT_CANCELED) {
+                Toast.makeText(this, "User canceled", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
