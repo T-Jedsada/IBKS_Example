@@ -8,3 +8,6 @@
 .idea/
 libs/
 src/main/res/drawable/
+
+.idea/instapk.xml
+instapk.log*
