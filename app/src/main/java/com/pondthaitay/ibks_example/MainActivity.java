@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
         }
     }
 
+    @SuppressWarnings("AccessStaticViaInstance")
     private void startScan() {
         int err;
         bleScanner = new ASBleScanner(this, this);
@@ -118,95 +119,18 @@ public class MainActivity extends AppCompatActivity implements ASScannerCallback
         MainActivityPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public void scannedBleDevices(ScanResult scanResult) {
-        String advertisingString = ASResultParser.byteArrayToHex(scanResult.getScanRecord().getBytes());
-        String logstr = scanResult.getDevice().getAddress() + " / RSSI: " + scanResult.getRssi() + " / Adv packet: " + advertisingString;
+        if(scanResult == null) return;
         int txPower = scanResult.getScanRecord().getTxPowerLevel();
-        Log.d(TAG, "TxPower : " + txPower);
-        Log.d(TAG, "distance : " + getDistance(scanResult.getRssi(), txPower));
-        Log.d(TAG, "ScanResult : " + scanResult.getScanRecord().toString());
-        ((TextView)findViewById(R.id.tv_distance)).setText(String.valueOf(getDistance(scanResult.getRssi(), txPower)));
+        ((TextView) findViewById(R.id.tv_distance)).setText(String.valueOf(getDistance(scanResult.getRssi(), txPower)));
         switch (ASResultParser.getAdvertisingType(scanResult)) {
             case ASUtils.TYPE_IBEACON:
-                /**** Example to get data from advertising ***
-                 advData = ASResultParser.getDataFromAdvertising(result);
-                 try {
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+" AdvTxPower = "+advData.getString("AdvTxPower")+" UUID = "+advData.getString("UUID")+" Major = "+advData.getString("Major")+" Minor = "+advData.getString("Minor"));
-                 }catch (Exception ex){
-                 Log.i(TAG,"Error parsing JSON");
-                 }
-                 /*******************************************/
-                Log.i(TAG, scanResult.getDevice().getName() + " - iBEACON - " + logstr);
-                break;
-            case ASUtils.TYPE_EDDYSTONE_UID:
-                /**** Example to get data from advertising ***
-                 advData = ASResultParser.getDataFromAdvertising(result);
-                 try {
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+" AdvTxPower = "+advData.getString("AdvTxPower")+" Namespace = "+advData.getString("Namespace")+" Instance = "+advData.getString("Instance"));
-                 }catch (Exception ex){
-                 Log.i(TAG,"Error parsing JSON");
-                 }
-                 /*******************************************/
-                Log.i(TAG, scanResult.getDevice().getName() + " - UID - " + logstr);
-                break;
-            case ASUtils.TYPE_EDDYSTONE_URL:
-                /**** Example to get data from advertising ***
-                 advData = ASResultParser.getDataFromAdvertising(result);
-                 try {
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+"  AdvTxPower = "+advData.getString("AdvTxPower")+" Url = "+advData.getString("Url"));
-                 }catch (Exception ex){
-                 Log.i(TAG,"Error parsing JSON");
-                 }
-                 /*******************************************/
-                Log.i(TAG, scanResult.getDevice().getName() + " - URL - " + logstr);
-
-                break;
-            case ASUtils.TYPE_EDDYSTONE_TLM:
-                /**** Example to get data from advertising ***
-                 advData = ASResultParser.getDataFromAdvertising(result);
-                 try {
-                 if(advData.getString("Version").equals("0")){
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+" Version = "+advData.getString("Version")+" Vbatt = "+advData.getString("Vbatt")+" Temp = "+advData.getString("Temp")+" AdvCount = "+advData.getString("AdvCount")+" TimeUp = "+advData.getString("TimeUp"));
-                 }
-                 else{
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+" Version = "+advData.getString("Version")+" EncryptedTLMData = "+advData.getString("EncryptedTLMData")+" Salt = "+advData.getString("Salt")+" IntegrityCheck = "+advData.getString("IntegrityCheck"));
-                 }
-                 }catch (Exception ex){
-                 Log.i(TAG,"Error parsing JSON");
-                 }
-                 /*******************************************/
-                Log.i(TAG, scanResult.getDevice().getName() + " - TLM - " + logstr);
-                break;
-            case ASUtils.TYPE_EDDYSTONE_EID:
-                /**** Example to get EID in Clear by the air ***
-                 if(!readingEID) {
-                 readingEID = true;
-                 new ASEDSTService(null,this,10);
-                 ASEDSTService.setClient_ProjectId(client, getPrefs.getString("projectId", null));
-                 ASEDSTService.getEIDInClearByTheAir(result);
-                 }
-                 /**************************************************/
-                /**** Example to get data from advertising ***
-                 advData = ASResultParser.getDataFromAdvertising(result);
-                 try {
-                 Log.i(TAG, "FrameType = " +advData.getString("FrameType")+" AdvTxPower = "+advData.getString("AdvTxPower")+" EID = "+advData.getString("EID"));
-                 }catch (Exception ex){
-                 Log.i(TAG,"Error parsing JSON");
-                 }
-                 /*******************************************/
-                Log.i(TAG, scanResult.getDevice().getName() + " - EID - " + logstr);
-                break;
-            case ASUtils.TYPE_DEVICE_CONNECTABLE:
-                Log.i(TAG, scanResult.getDevice().getName() + " - CONNECTABLE - " + logstr);
-                break;
-            case ASUtils.TYPE_UNKNOWN:
-                Log.i(TAG, scanResult.getDevice().getName() + " - UNKNOWN - " + logstr);
+                Log.d(TAG, "RSSI: " + scanResult.getRssi() + " / tx power: " + scanResult.getScanRecord().getTxPowerLevel());
                 break;
             default:
-                Log.i(TAG, "ADVERTISING TYPE: " + "ERROR PARSING");
                 break;
         }
     }
 }
-
