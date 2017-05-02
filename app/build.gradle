@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    buildToolsVersion "25.0.3"
     defaultConfig {
         applicationId "com.pondthaitay.ibks_example"
         minSdkVersion 21
@@ -30,6 +30,13 @@ ext {
     permissionsdispatcher = "2.3.2"
 }
 
+repositories {
+    maven {
+        url "https://dl.bintray.com/alt236/maven"
+    }
+}
+
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
@@ -38,7 +45,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
-    compile 'com.accent_systems.ibks-sdk:ibks-sdk:1.0.2'
+    compile 'uk.co.alt236:bluetooth-le-library-android:1.0.0'
+    compile 'com.estimote:sdk:1.0.3:release@aar'
     compile "com.github.hotchemi:permissionsdispatcher:${permissionsdispatcher}"
     annotationProcessor "com.github.hotchemi:permissionsdispatcher-processor:${permissionsdispatcher}"
 }
